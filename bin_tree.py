@@ -3,8 +3,8 @@ class Node:
     def __init__(self, val):
         self.left = None
         self.right = None
-        self.parent = None
         self.value = val
+        self.height = 1
 
     def _str(self):
         return "%d" % self.value
@@ -28,7 +28,7 @@ class BTree:
             if data < root.value:
                 if not root.left:
                     root.left = Node(data)
-                    root.left.parent = root
+#                    root.left.parent = root
                     self.size += 1
                     return
                 else:
@@ -38,11 +38,59 @@ class BTree:
             elif data > root.value:
                 if not root.right:
                     root.right = Node(data)
-                    root.right.parent = root
+#                    root.right.parent = root
                     self.size += 1
                     return
                 else:
                     root = root.right
+
+    def height(self, node):
+        return node.height if node else 0
+
+    def bfactor(self, node):
+        return self.height(node.right) - self.height(node.left)
+
+    def fix_height(self, node):
+        hl = self.height(node.left)
+        hr = self.height(node.right)
+        node.height = (hl if hl > hr else hr) + 1
+
+    def right_rot(self, node):
+        q = node.left
+        node.left = q.right
+        q.right = node
+        self.fix_height(node)
+        self.fix_height(q)
+        return q
+
+    def left_rot(self, node):
+        q = node.right
+        node.right = q.left
+        q.left = node
+        self.fix_height(node)
+        self.fix_height(q)
+        return q
+
+    def balance(self, node):
+        self.fix_height(node)
+        bf = self.bfactor(node)
+        if bf >= 2:
+            if bf < 0:
+                node.right = self.right_rot(node.right)
+            return self.left_rot(node)
+        elif bf <= -2:
+            if bf > 0:
+                node.left = self.left_rot(node.left)
+            return self.right_rot(node)
+        return node
+
+    def rebalance(self, node):
+        if node is None:
+            pass
+        else:
+            node.left = self.rebalance(node.left)
+            node.right = self.rebalance(node.right)
+            return self.balance(node)
 
 
 class Heap:
@@ -75,6 +123,7 @@ class Heap:
     def print(self):
         print(*self.list)
 
+
 COUNT = [5]
 
 
@@ -100,3 +149,6 @@ if __name__ == "__main__":
     heap = Heap(nodes)
     heap.heapsort()
     heap.print()
+    tree.head = tree.rebalance(tree.head)
+    tree.head = tree.rebalance(tree.head)
+    print2DUtil(tree.head)
