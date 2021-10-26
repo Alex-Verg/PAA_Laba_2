@@ -28,7 +28,6 @@ class BTree:
             if data < root.value:
                 if not root.left:
                     root.left = Node(data)
-#                    root.left.parent = root
                     self.size += 1
                     return
                 else:
@@ -38,7 +37,6 @@ class BTree:
             elif data > root.value:
                 if not root.right:
                     root.right = Node(data)
-#                    root.right.parent = root
                     self.size += 1
                     return
                 else:
@@ -77,11 +75,17 @@ class BTree:
         if bf >= 2:
             if bf < 0:
                 node.right = self.right_rot(node.right)
-            return self.left_rot(node)
+            node = self.left_rot(node)
+#            print("-" * 50 + "\n" + "Rebalance iterations:\n" + "-" * 50)
+#            print2DUtil(self.head)
+            return node
         elif bf <= -2:
             if bf > 0:
                 node.left = self.left_rot(node.left)
-            return self.right_rot(node)
+            node = self.right_rot(node)
+#            print("-" * 50 + "\n" + "Rebalance iterations:\n" + "-" * 50)
+#            print2DUtil(self.head)
+            return node
         return node
 
     def rebalance(self, node):
